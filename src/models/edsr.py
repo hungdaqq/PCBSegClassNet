@@ -8,11 +8,14 @@ Preprocessing super resolution
 
 from tensorflow.keras import layers
 import tensorflow as tf
+from tensorflow.keras.layers import Layer
+
 
 class EDSRModel(tf.keras.Model):
     """
     Main class of super resolution model
     """
+
     def train_step(self, data):
         """
         forward pass function
@@ -55,6 +58,7 @@ class EDSRModel(tf.keras.Model):
         )
         return super_resolution_img
 
+
 # Residual Block
 def resblock(inputs):
     """
@@ -65,16 +69,27 @@ def resblock(inputs):
     out = layers.Add()([inputs, out])
     return out
 
+
+class DepthToSpaceLayer(Layer):
+    def __init__(self, block_size, **kwargs):
+        super(DepthToSpaceLayer, self).__init__(**kwargs)
+        self.block_size = block_size
+
+    def call(self, inputs):
+        return tf.nn.depth_to_space(inputs, block_size=self.block_size)
+
+
 # Upsampling Block
 def upsampling(inputs, factor=2, **kwargs):
     """
     upsampling convolution block
     """
-    out = layers.Conv2D(64 * (factor ** 2), 3, padding="same", **kwargs)(inputs)
-    out = tf.nn.depth_to_space(out, block_size=factor)
-    out = layers.Conv2D(64 * (factor ** 2), 3, padding="same", **kwargs)(out)
-    out = tf.nn.depth_to_space(out, block_size=factor)
+    out = layers.Conv2D(64 * (factor**2), 3, padding="same", **kwargs)(inputs)
+    out = DepthToSpaceLayer(block_size=factor)(out)
+    out = layers.Conv2D(64 * (factor**2), 3, padding="same", **kwargs)(out)
+    out = DepthToSpaceLayer(block_size=factor)(out)
     return out
+
 
 def get_edsr_model(num_filters, num_of_residual_blocks):
     """
