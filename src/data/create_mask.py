@@ -85,6 +85,8 @@ def prepare_data(
         for annotation in annotations_list:
             df = pd.read_csv(annotation)
             # checking if atleast 1 designation is present in annotation
+            if "Designator" not in df:
+                df["Designator"] = df["IC"]
             if df["Designator"].isna().sum() != df.shape[0]:
                 image_name = list(df["Image File"].unique())
                 if os.path.exists(os.path.join(source_image_dir, image_name[0])):
