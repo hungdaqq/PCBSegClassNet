@@ -84,9 +84,11 @@ def prepare_data(
     with tqdm(total=len(annotations_list)) as pbar:
         for annotation in annotations_list:
             df = pd.read_csv(annotation)
+
             # checking if atleast 1 designation is present in annotation
             if "Designator" not in df:
                 df["Designator"] = df["IC"]
+
             if df["Designator"].isna().sum() != df.shape[0]:
                 image_name = list(df["Image File"].unique())
                 if os.path.exists(os.path.join(source_image_dir, image_name[0])):
@@ -134,11 +136,13 @@ def prepare_data(
                     if len(np.unique(mask)) > 1:
                         cv2.imwrite(
                             os.path.join(dest_masks_sir, image_name[0]),
-                            cv2.cvtColor(mask, cv2.COLOR_BGR2RGB),
+                            # cv2.cvtColor(mask, cv2.COLOR_BGR2RGB),
+                            mask,
                         )
                         cv2.imwrite(
                             os.path.join(dest_images_dir, image_name[0]),
-                            cv2.cvtColor(img1, cv2.COLOR_BGR2RGB),
+                            # cv2.cvtColor(img1, cv2.COLOR_BGR2RGB),
+                            img1,
                         )
                     count += 1
                     pbar.update(1)
