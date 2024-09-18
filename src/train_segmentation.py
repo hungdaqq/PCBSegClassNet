@@ -19,26 +19,22 @@ from utils import dict2str, parse, get_msg
 from models import get_model
 from data import get_data
 
+
 def parse_config():
     """
     Helper function to parse config
     """
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "-opt",
-        type=str,
-        required=True,
-        help="Path to option YAML file."
+        "-opt", type=str, required=True, help="Path to option YAML file."
     )
-    parser.add_argument("-epoch",
-                        type=int,
-                        default=1,
-                        help="number of epochs.")
+    parser.add_argument("-epoch", type=int, default=1, help="number of epochs.")
     args = parser.parse_args()
 
     opt = parse(args.opt)
     opt["train"]["total_epochs"] = args.epoch
     return opt
+
 
 def init_log(opt):
     """
@@ -56,6 +52,7 @@ def init_log(opt):
 
     logger.info(get_msg())
     logger.info(dict2str(opt))
+
 
 def main():
     """
